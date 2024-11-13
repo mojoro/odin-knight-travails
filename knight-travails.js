@@ -14,7 +14,7 @@ class KnightMovesGraph {
   }
 
   knightAdjacencyList() {
-    const adjacencyList = {};
+    const adjacencyList = [];
     let x = 0,
       y = 0;
     while (x < this.board.length && y <= this.board[x].length) {
@@ -22,9 +22,8 @@ class KnightMovesGraph {
         y = 0;
         x++;
       }
-      const edges = this.singleMove([x, y]);
-      const keyString = `${x},${y++}`;
-      adjacencyList[keyString] = edges;
+      const edges = this.singleMove([x, y++]);
+      adjacencyList.push(edges);
     }
     return adjacencyList;
   }
@@ -46,7 +45,8 @@ class KnightMovesGraph {
 
     for (const permutation of permutations) {
       let newCoords = [leftCoord + permutation[0], rightCoord + permutation[1]];
-      if (this.checkCoordValidity(newCoords)) possibleMoves.push(newCoords);
+      if (this.checkCoordValidity(newCoords))
+        possibleMoves.push(this.returnIndexFromCoords(newCoords));
     }
     return possibleMoves;
   }
@@ -57,8 +57,18 @@ class KnightMovesGraph {
     else return false;
   }
 
-  returnStringFromCoords(coords) {
-    return `${coords[0]},${coords[1]}`;
+  returnIndexFromCoords(coords) {
+    let x = coords[0],
+      y = coords[1],
+      index = x * 8 + y;
+    return index;
+  }
+
+  returnCoordsFromIndex(index) {
+    const coords = [];
+    coords[0] = Math.floor(index / 8);
+    coords[1] = index % 8;
+    return coords;
   }
 }
 
@@ -70,16 +80,15 @@ function knightMoves(startingCoords, endingCoords) {
   )
     throw new Error("Invalid coordinates!");
 
-  const startingString = graph.returnStringFromCoords(startingCoords);
-  const endingString = graph.returnStringFromCoords(endingCoords);
   let pathSize = 0;
   const path = [startingCoords];
+  const startingIndex = graph.returnIndexFromCoords(startingCoords);
+  const endingIndex = graph.returnIndexFromCoords(endingCoords);
 
-  for (const possibleMove of graph.adjacencyList[startingString]) {
-    const possibleString = graph.returnStringFromCoords(possibleMove);
-    if (possibleString == endingString) {
+  for (const possibleMove of graph.singleMove(startingCoords)) {
+    if (possibleMove == endingIndex) {
       pathSize++;
-      path.push(possibleMove);
+      path.push(graph.returnCoordsFromIndex(possibleMove));
       console.log(`You arrived in ${pathSize} move!`);
       console.log(path);
       return;
