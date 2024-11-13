@@ -1,3 +1,11 @@
+class Node {
+  constructor(vertex = null, moves = null) {
+    this.vertex = vertex;
+    this.parent = null;
+    this.moves = moves;
+  }
+}
+
 class KnightMovesGraph {
   constructor() {
     this.board = [
@@ -70,6 +78,54 @@ class KnightMovesGraph {
     coords[1] = index % 8;
     return coords;
   }
+
+  findEnd(startingIndex, endingIndex) {
+    const startingNode = new Node(
+      startingIndex,
+      this.adjacencyList[startingIndex]
+    );
+    const endingNode = new Node(endingIndex, this.adjacencyList[endingIndex]);
+    let pathSize = 0;
+    const path = [pathSize, this.returnCoordsFromIndex(startingIndex)];
+    let found = false;
+    let i = 0,
+      j = 0;
+
+    while (found == false && i < startingNode.moves.length) {
+      let startingMove = startingNode.moves[i];
+      let endingMove = endingNode.moves[j++];
+      if (j == endingNode.moves.length) {
+        j = 0;
+        i++;
+      }
+      if (startingNode.vertex == endingMove) {
+        path[0]++;
+        path.push(this.returnCoordsFromIndex(endingNode.vertex));
+        found = true;
+        return path;
+      } else if (startingMove == endingMove) {
+        path[0]++;
+        path.push(this.returnCoordsFromIndex(endingMove));
+        path[0]++;
+        path.push(this.returnCoordsFromIndex(endingNode.vertex));
+        found = true;
+        return path;
+      }
+    }
+    return false;
+  }
+
+  findPath(startingIndex, endingIndex) {
+    const startingNode = new Node(
+      startingIndex,
+      this.adjacencyList[startingIndex]
+    );
+    const endingNode = new Node(endingIndex, this.adjacencyList[endingIndex]);
+    for (const move of startingNode.moves) {
+      let path = this.findEnd(move, endingIndex);
+      if (path) return path;
+    }
+  }
 }
 
 function knightMoves(startingCoords, endingCoords) {
@@ -79,20 +135,11 @@ function knightMoves(startingCoords, endingCoords) {
     !graph.checkCoordValidity(endingCoords)
   )
     throw new Error("Invalid coordinates!");
-
-  let pathSize = 0;
-  const path = [startingCoords];
   const startingIndex = graph.returnIndexFromCoords(startingCoords);
   const endingIndex = graph.returnIndexFromCoords(endingCoords);
-
-  for (const possibleMove of graph.singleMove(startingCoords)) {
-    if (possibleMove == endingIndex) {
-      pathSize++;
-      path.push(graph.returnCoordsFromIndex(possibleMove));
-      console.log(`You arrived in ${pathSize} move!`);
-      console.log(path);
-      return;
-    }
+  const path = graph.findPath(startingIndex, endingIndex);
+  for (const entry of path) {
+    console.log(entry);
   }
 }
 
@@ -101,4 +148,5 @@ function knightMoves(startingCoords, endingCoords) {
 // calculate edges for the board based on the move sequence
 // depth first or breadth first search to find the shortest path
 
-knightMoves([0, 0], [1, 2]);
+knightMoves([0, 0], [1, 6]);
+const graph = new KnightMovesGraph();
