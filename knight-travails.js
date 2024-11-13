@@ -41,14 +41,14 @@ class KnightMovesGraph {
     const leftCoord = startingCoords[0];
     const rightCoord = startingCoords[1];
     const permutations = [
-      [1, 2],
-      [2, 1],
-      [-1, 2],
-      [-2, 1],
-      [1, -2],
-      [2, -1],
-      [-1, -2],
       [-2, -1],
+      [-2, 1],
+      [-1, -2],
+      [-1, 2],
+      [1, -2],
+      [1, 2],
+      [2, -1],
+      [2, 1],
     ];
 
     for (const permutation of permutations) {
@@ -150,3 +150,4 @@ function knightMoves(startingCoords, endingCoords) {
 
 knightMoves([0, 0], [1, 6]);
 const graph = new KnightMovesGraph();
+console.log(graph.singleMove([2, 4]));
