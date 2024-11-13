@@ -93,97 +93,38 @@ class KnightMovesGraph {
     return coords;
   }
 
-  findEnd(startingVertex, endingVertex) {
-    const startingNode = new Node(
-      startingVertex,
-      this.adjacencyList[startingVertex],
-      this.adjacencyList
-    );
-    const endingNode = new Node(
-      endingVertex,
-      this.adjacencyList[endingVertex],
-      this.adjacencyList
-    );
-    let pathSize = 0;
-    const path = [pathSize, this.returnCoordsFromVertex(startingVertex)];
-    let found = false;
-    let i = 0,
-      j = 0;
-
-    while (found == false && i < startingNode.moves.length) {
-      let startingMove = startingNode.moves[i];
-      let endingMove = endingNode.moves[j++];
-      if (j == endingNode.moves.length) {
-        j = 0;
-        i++;
-      }
-      if (startingNode.vertex == endingMove) {
-        path[0]++;
-        path.push(this.returnCoordsFromVertex(endingNode.vertex));
-        found = true;
-        return path;
-      } else if (startingMove == endingMove) {
-        path[0]++;
-        path.push(this.returnCoordsFromVertex(endingMove));
-        path[0]++;
-        path.push(this.returnCoordsFromVertex(endingNode.vertex));
-        found = true;
-        return path;
-      }
-    }
-    return false;
-  }
-
-  findPath(startingVertex, endingVertex) {
-    const startingNode = new Node(
-      startingVertex,
-      this.adjacencyList[startingVertex],
-      this.adjacencyList
-    );
-    const endingNode = new Node(
-      endingVertex,
-      this.adjacencyList[endingVertex],
-      this.adjacencyList
-    );
-    for (const move of startingNode.moves) {
-      let path = this.findEnd(move, endingVertex);
-      if (path) return path;
-    }
-  }
-
-  findSinglePath(startingVertex, targetVertex) {
-    const node = new Node(
-      startingVertex,
-      this.adjacencyList[startingVertex],
-      this.adjacencyList
-    );
-
-    let q = [startingVertex];
+  findPath(startingVertex, targetVertex) {
+    let q = [[startingVertex, null]];
     let frontIndex = 0;
+    let depth = 0;
 
     while (frontIndex < q.length) {
       let front = q[frontIndex];
       let node = new Node(
-        startingVertex,
-        this.adjacencyList[startingVertex],
+        front[0],
+        this.adjacencyList[front[0]],
         this.adjacencyList
       );
-      if (front.left) q.push(front.left);
-      if (front.right) q.push(front.right);
-      frontIndex++;
-    }
-    /**
-      if (startingVertex == targetVertex) {
-        return true;
-      } else {
+      if (front[1]) node.parent = front[1];
+
+      if (node.vertex == targetVertex) return this.returnDepthFromNode(node);
+      else {
         for (const move of node.moves) {
-          if (move == targetVertex) return true;
+          q.push([move, node]);
         }
       }
-      for (const move of node.moves) {
-        return this.findSinglePath(move, targetVertex);
-      }
-    */
+      depth++;
+      frontIndex++;
+    }
+  }
+
+  returnDepthFromNode(node) {
+    let depth = 0;
+    while (node.parent) {
+      depth++;
+      node = node.parent;
+    }
+    return depth;
   }
 
   printLevels(vertex, depth) {
@@ -227,4 +168,6 @@ knightMoves([0, 0], [1, 6]);
 const graph = new KnightMovesGraph();
 
 console.log(graph.singleMove(graph.returnCoordsFromVertex(17)));
-console.log(graph.findSinglePath(0, 34));
+console.log(graph.printLevels(0, 2));
+
+console.log(graph.findSinglePath(0, 63));
