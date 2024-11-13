@@ -88,10 +88,14 @@ class KnightMovesGraph {
     let pathSize = 0;
     const path = [pathSize, this.returnCoordsFromIndex(startingIndex)];
     let found = false;
+    let q = [];
     let i = 0,
       j = 0;
 
-    while (found == false && i < startingNode.moves.length) {
+    let currentNodes = [startingNode, endingNode];
+    q.push(currentNodes);
+
+    while (q.length > 0 && found == false && i < q[0][0].moves.length) {
       let startingMove = startingNode.moves[i];
       let endingMove = endingNode.moves[j++];
       if (j == endingNode.moves.length) {
